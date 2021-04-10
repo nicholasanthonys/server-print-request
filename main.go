@@ -32,12 +32,39 @@ func main() {
 	e.POST("/", printRequest)
 	e.PUT("/", printRequest)
 
+	e.POST("/error/bad-request", returnBadRequest)
+	e.PUT("/error/bad-request", returnBadRequest)
+
+	e.POST("/dummy-response", returnDummyResponse)
+
 	// Routes
-	e.POST("/:anything", printRequest)
-	e.PUT("/:anything", printRequest)
+	// e.POST("/:anything", printRequest)
+	// e.PUT("/:anything", printRequest)
 
 	// Start server
 	e.Logger.Fatal(e.Start(":3001"))
+}
+
+type dummyResponse struct {
+	DummyObject map[string]interface{}
+}
+
+func returnDummyResponse(c echo.Context) error {
+	logrus.Info("triggered")
+	dummyResponse := &dummyResponse{
+		DummyObject: (map[string]interface{}{
+			"loop": 3,
+		}),
+	}
+	return c.JSON(http.StatusOK, dummyResponse)
+}
+
+func returnBadRequest(c echo.Context) error {
+	resMap := map[string]string{
+		"message": "Bad Requestzz",
+	}
+
+	return c.JSON(http.StatusBadRequest, resMap)
 }
 
 func printRequest(c echo.Context) error {
