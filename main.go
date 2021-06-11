@@ -37,6 +37,8 @@ func main() {
 
 	e.POST("/dummy-response", returnDummyResponse)
 
+	e.POST("/status-ok", returnStatusOK)
+
 	// Routes
 	// e.POST("/:anything", printRequest)
 	// e.PUT("/:anything", printRequest)
@@ -51,6 +53,12 @@ type dummyResponse struct {
 
 func returnDummyResponse(c echo.Context) error {
 	logrus.Info("triggered")
+	reqByte, err := ioutil.ReadAll(c.Request().Body)
+	if err != nil {
+		logrus.Warn(err.Error())
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+	logrus.Info(string(reqByte))
 	dummyResponse := &dummyResponse{
 		DummyObject: (map[string]interface{}{
 			"loop": 3,
@@ -65,6 +73,10 @@ func returnBadRequest(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusBadRequest, resMap)
+}
+
+func returnStatusOK(c echo.Context) error {
+	return c.JSON(http.StatusOK, "")
 }
 
 func printRequest(c echo.Context) error {
